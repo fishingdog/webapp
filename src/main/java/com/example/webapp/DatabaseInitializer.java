@@ -17,7 +17,7 @@ public class DatabaseInitializer {
 
     @PostConstruct
     public void createDatabase() {
-        String databaseName = "A3";
+        String databaseName = "webapp";
         try (Connection conn = dataSource.getConnection();
              Statement stmt = conn.createStatement()) {
             stmt.executeUpdate("CREATE DATABASE IF NOT EXISTS " + databaseName);
