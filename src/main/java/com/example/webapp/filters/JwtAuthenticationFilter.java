@@ -20,11 +20,10 @@ import java.io.IOException;
 
 @Component
 @RequiredArgsConstructor
-public class JwtRequestFilter  extends OncePerRequestFilter {
-    @Autowired
-    private UserDetailsService userDetailsService;
-    @Autowired
-    private final JwtService jwtUtil;
+public class JwtAuthenticationFilter extends OncePerRequestFilter {
+
+    private final UserDetailsService userDetailsService;
+    private final JwtService jwtService;
 
     @Override
     protected void doFilterInternal(
@@ -42,22 +41,21 @@ public class JwtRequestFilter  extends OncePerRequestFilter {
             return;
         }
         jwt = authorizationHeader.substring(7);
-//        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer")) {
-//            jwt = authorizationHeader.substring(7); //strip "Bearer"
-//            username = jwtUtil.extractUsername(jwt);
-//        }
-
+        userEmail = jwtService.extractUsername(jwt);
         //if not already authenticated
         if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
 
-            if (jwtUtil.validateToken(jwt, userDetails)) {
-                UsernamePasswordAuthenticationToken authenticationToken =
-                        new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+            if (jwtService.isTokenValid(jwt, userDetails)) {
+                UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
+                        userDetails,
+                        null,
+                        userDetails.getAuthorities()
+                );
                 authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authenticationToken);
             }
         }
-        chain.doFilter(request, response);
+        filterChain.doFilter(request, response);
     }
 }
