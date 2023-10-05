@@ -22,14 +22,15 @@ public class User implements UserDetails {
     private String password;
     private LocalDateTime accountCreated;
     private LocalDateTime accountUpdated;
-    @Enumerated(EnumType.STRING)
-    private Role role;
+//    @Enumerated(EnumType.STRING)
+//    private Role role;
 
     public User(String firstName, String lastName, String email, String password) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
         this.password = password;
+//        this.role = Role.ROLE_USER;
     }
 
     public User(){
@@ -75,7 +76,8 @@ public class User implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority(role.name()));
+        return List.of();
+//        return List.of(new SimpleGrantedAuthority(role.name()));
     }
 
     @Override

@@ -18,7 +18,7 @@ public class HealthzEndpointTest {
 
     @Test
     public void testHealtzEndpoint() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.get("/healtz"))
+        mockMvc.perform(MockMvcRequestBuilders.get("/healthz"))
                 .andExpect(status().isOk());
     }
 }
