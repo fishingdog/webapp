@@ -31,6 +31,17 @@ public class AssignmentController {
             return ResponseEntity.badRequest().body("Creation Fail. Points Must Be Between 0 and 10.");
         }
 
+        // 1. Get the authenticated user's details from the SecurityContext
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        String username = userDetails.getUsername();
+
+        // 2. Retrieve the corresponding User entity from the database
+        User currentUser = userService.findByEmail(username);
+
+        // 3. Set the retrieved User entity as the creator of the Assignment
+        assignment.setCreator(currentUser);
+
         return ResponseEntity.ok(assignmentService.createAssignment(assignment));
     }
 
