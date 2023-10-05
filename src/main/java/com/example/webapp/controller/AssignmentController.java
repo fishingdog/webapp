@@ -24,12 +24,24 @@ public class AssignmentController {
     private UserService userService;
 
     @PostMapping
-    public ResponseEntity<Assignment> createAssignment(@RequestBody Assignment assignment) {
+    public ResponseEntity<?> createAssignment(@RequestBody Assignment assignment) {
+
+        if (assignment.getPoints() < 0 || assignment.getPoints() > 10) {
+            // HTTP 400 BAD REQUEST
+            return ResponseEntity.badRequest().body("Creation Fail. Points Must Be Between 0 and 10.");
+        }
+
         return ResponseEntity.ok(assignmentService.createAssignment(assignment));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<?> updateAssignment(@PathVariable Long id, @RequestBody Assignment assignment) {
+
+        if (assignment.getPoints() < 0 || assignment.getPoints() > 10) {
+            // HTTP 400 BAD REQUEST
+            return ResponseEntity.badRequest().body("Update Fail. Points Must Be Between 0 and 10.");
+        }
+
         try {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             UserDetails userDetails = (UserDetails) authentication.getPrincipal();
