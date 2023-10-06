@@ -38,11 +38,12 @@ jobs:
       # Create the users.csv file
       - name: Create users.csv
         run: |
-          sudo cat << EOF > /opt/users.csv
+          sudo sh -c 'cat << EOF > /opt/users.csv
           first_name,last_name,email,password
           john,doe,john.doe@example.com,abc123
           jane,doe,jane.doe@example.com,xyz456
-          EOF
+          EOF'
+
 
 
       - name: Build with Maven
