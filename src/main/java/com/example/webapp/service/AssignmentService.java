@@ -23,27 +23,28 @@ public class AssignmentService {
         return assignmentRepository.save(assignment);
     }
 
-    public Optional<Assignment> getAssignmentById(Long id) {
-        return assignmentRepository.findById(id);
+    public Optional<Assignment> getAssignmentByName(String name) {
+        return assignmentRepository.findByName(name);
     }
 
-    public Assignment updateAssignment(Long id, Assignment assignment, User currentUser) throws IllegalAccessError, IllegalAccessException {
+    public Assignment updateAssignment(String name, Assignment assignment, User currentUser) throws IllegalAccessError, IllegalAccessException {
 
-        Assignment existingAssignment = assignmentRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Assignment Not Found."));
+        Assignment existingAssignment = assignmentRepository.findByName(name).orElseThrow(() -> new IllegalArgumentException("Assignment Not Found."));
 
         if (!existingAssignment.getCreator().equals(currentUser)) {
             throw new IllegalAccessException("Cannot Update. Permission Denied.");
         }
 
         existingAssignment.setAssignmentUpdated(LocalDateTime.now());
-        existingAssignment.setTitle(assignment.getTitle());
-        existingAssignment.setDescription(assignment.getDescription());
+        existingAssignment.setName(assignment.getName());
+        existingAssignment.setDeadline(assignment.getDeadline());
         existingAssignment.setPoints(assignment.getPoints());
+        existingAssignment.setNum_of_attempts(assignment.getNum_of_attempts());
         return assignmentRepository.save(existingAssignment);
     }
 
-    public void deleteAssignment(Long id, User currentUser) throws IllegalAccessException {
-        Assignment existingAssignment = assignmentRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Assignment Not Found."));
+    public void deleteAssignment(String name, User currentUser) throws IllegalAccessException {
+        Assignment existingAssignment = assignmentRepository.findByName(name).orElseThrow(() -> new IllegalArgumentException("Assignment Not Found."));
 
         if (!existingAssignment.getCreator().equals(currentUser)) {
             throw new IllegalAccessException("Cannot Delete. Permission Denied.");

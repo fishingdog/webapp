@@ -2,6 +2,7 @@ package com.example.webapp.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import org.hibernate.annotations.GenericGenerator;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -9,12 +10,17 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 
 @Entity
+@Table(name = "Account")
 public class User implements UserDetails {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(generator = "UUID")
+    @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
+    @Column(name = "id", updatable = false, nullable = false)
+    private UUID id;
+
     private String email;
     private String firstName;
     private String lastName;
@@ -22,15 +28,12 @@ public class User implements UserDetails {
     private String password;
     private LocalDateTime accountCreated;
     private LocalDateTime accountUpdated;
-//    @Enumerated(EnumType.STRING)
-//    private Role role;
 
     public User(String firstName, String lastName, String email, String password) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
         this.password = password;
-//        this.role = Role.ROLE_USER;
     }
 
     public User(){

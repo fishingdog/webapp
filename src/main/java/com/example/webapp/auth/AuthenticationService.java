@@ -1,12 +1,10 @@
 package com.example.webapp.auth;
 
-import com.example.webapp.model.Role;
 import com.example.webapp.repository.UserRepository;
 import com.example.webapp.util.JwtService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;

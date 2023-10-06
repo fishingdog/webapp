@@ -1,76 +1,35 @@
 package com.example.webapp.model;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+import org.hibernate.annotations.GenericGenerator;
 
 import java.time.LocalDateTime;
+import java.util.Date;
+import java.util.UUID;
 
 @Entity
+@Getter
+@Setter
 public class Assignment {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(generator = "UUID")
+    @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
+    @Column(name = "id", updatable = false, nullable = false)
+    private UUID id;
 
     @ManyToOne
     private User creator;
 
-    private String title;
-    private String description;
+    private String name;
+    private Date deadline;
     private int points;
+    private int num_of_attempts;
 
     @Column(updatable = false)
     private LocalDateTime assignmentCreated;
     private LocalDateTime assignmentUpdated;
 
-    public Long getId() {
-        return id;
-    }
-
-    public User getCreator() {
-        return creator;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public int getPoints() {
-        return points;
-    }
-
-    public LocalDateTime getAssignmentCreated() {
-        return assignmentCreated;
-    }
-
-    public LocalDateTime getAssignmentUpdated() {
-        return assignmentUpdated;
-    }
-
-    public void setCreator(User creator) {
-        this.creator = creator;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public void setPoints(int points) {
-        this.points = points;
-    }
-
-    public void setAssignmentCreated(LocalDateTime assignmentCreated) {
-        this.assignmentCreated = assignmentCreated;
-    }
-
-    public void setAssignmentUpdated(LocalDateTime assignmentUpdated) {
-        this.assignmentUpdated = assignmentUpdated;
-    }
 }
