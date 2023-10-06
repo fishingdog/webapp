@@ -4,10 +4,11 @@ on:
   push:
     branches:
       - main
+      - YanWuGit-patch-1
   pull_request:
     branches:
       - main
-
+      - YanWuGit-patch-1
 jobs:
   build:
     runs-on: ubuntu-latest
