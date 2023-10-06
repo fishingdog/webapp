@@ -35,16 +35,8 @@ jobs:
           java-version: '17'
           distribution: 'adopt'
 
-      - name: Setup Maven Action
-        uses: s4u/setup-maven-action@v1.7.0
-        with:
-          checkout-fetch-depth: 0
-          java-version: 8
-          java-distribution: temurin
-          maven-version: 3.8.7
-
       - name: Build with Maven
-        run: mvn -B package --file pom.xml
+        run: ./mvnw -B package --file pom.xml
 #
 #      - name: Run Tests
 #        run: mvn test
