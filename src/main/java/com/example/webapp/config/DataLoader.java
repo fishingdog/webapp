@@ -27,8 +27,11 @@ public class DataLoader implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
 
-        File file = new ClassPathResource("static/users.csv").getFile(); // delete this line in demo
-        FileReader reader = new FileReader(file); //change to "/opt/users.csv" in demo
+
+//        File file = new ClassPathResource("/opt/users.csv").getFile(); // delete this line in demo
+//        FileReader reader = new FileReader(file); //change to "/opt/users.csv" in demo
+
+        FileReader reader = new FileReader("/opt/users.csv");
 
         CsvToBean<UserCSV> csvToBean = new CsvToBeanBuilder<UserCSV>(reader)
                 .withType(UserCSV.class)
