@@ -1,9 +1,19 @@
 name: CI
 
 on:
+  workflow_dispatch:
   pull_request:
     branches:
+      - main
       - YanWuGit-patch-1
+  push:
+    branches:
+      - main
+      - YanWuGit-patch-1
+
+defaults:
+  run:
+    shell: bash
 
 jobs:
   build:
