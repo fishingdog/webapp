@@ -1,6 +1,7 @@
 package com.example.webapp.model;
 
 import jakarta.persistence.*;
+
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.GenericGenerator;
@@ -20,13 +21,16 @@ public class Assignment {
     @Column(name = "id", updatable = false, nullable = false)
     private UUID id;
 
+
     @ManyToOne
     private User creator;
+
 
     private String name;
     private Date deadline;
     private int points;
     private int num_of_attempts;
+
 
     @Column(updatable = false)
     private LocalDateTime assignmentCreated;
