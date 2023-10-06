@@ -44,7 +44,7 @@ jobs:
           maven-version: 3.8.7
 
       - name: Build with Maven
-        run: mvn clean install
+        run: ./mvnw -B package --file pom.xml
 #
 #      - name: Run Tests
 #        run: mvn test
