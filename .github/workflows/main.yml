@@ -22,7 +22,7 @@ jobs:
         env:
           MYSQL_ROOT_PASSWORD: Miemiemie!23
           MYSQL_DATABASE: webapp
-          MYSQL_USER: user
+          MYSQL_USER: beluga
           MYSQL_PASSWORD: Miemiemie!23
         ports:
           - 3306:3306
@@ -56,7 +56,7 @@ jobs:
         run: mvn test
         env:
           SPRING_DATASOURCE_URL: jdbc:mysql://localhost:3306/webapp?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
-          SPRING_DATASOURCE_USERNAME: user
+          SPRING_DATASOURCE_USERNAME: beluga
           SPRING_DATASOURCE_PASSWORD: Miemiemie!23
 
 
