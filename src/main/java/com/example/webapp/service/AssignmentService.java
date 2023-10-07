@@ -23,6 +23,7 @@ public class AssignmentService {
         return assignmentRepository.save(assignment);
     }
 
+
     public Optional<Assignment> getAssignmentByName(String name) {
         return assignmentRepository.findByName(name);
     }
@@ -31,11 +32,13 @@ public class AssignmentService {
 
         Assignment existingAssignment = assignmentRepository.findByName(name).orElseThrow(() -> new IllegalArgumentException("Assignment Not Found."));
 
+
         if (!existingAssignment.getCreator().equals(currentUser)) {
             throw new IllegalAccessException("Cannot Update. Permission Denied.");
         }
 
         existingAssignment.setAssignmentUpdated(LocalDateTime.now());
+
         existingAssignment.setName(assignment.getName());
         existingAssignment.setDeadline(assignment.getDeadline());
         existingAssignment.setPoints(assignment.getPoints());
