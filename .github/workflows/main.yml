@@ -22,7 +22,7 @@ jobs:
         env:
           MYSQL_ROOT_PASSWORD: Miemiemie!23
           MYSQL_DATABASE: webapp
-          MYSQL_USER: user
+          MYSQL_USER: beluga
           MYSQL_PASSWORD: Miemiemie!23
         ports:
           - 3306:3306
