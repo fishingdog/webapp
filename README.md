@@ -67,5 +67,3 @@ Tips and Troubleshooting
     Always check the response body for any error messages. They might provide clues on what went wrong.
     For any 400 Bad Request responses, validate your input against the API's expected input format.
     If you're using the environment setup in Postman, make sure to select the environment from the drop-down list at the top right.
-
-test demo
