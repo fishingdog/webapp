@@ -15,16 +15,16 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-    services:
-      mysql:
-        image: mysql:8.0
-        env:
-          MYSQL_ROOT_PASSWORD: Miemiemie!23
-          MYSQL_DATABASE: webapp
-          MYSQL_USER: beluga
-          MYSQL_PASSWORD: Miemiemie!23
-        ports:
-          - 3306:3306
+    # services:
+    #   mysql:
+    #     image: mysql:8.0
+    #     env:
+    #       MYSQL_ROOT_PASSWORD: Miemiemie!23
+    #       MYSQL_DATABASE: webapp
+    #       MYSQL_USER: beluga
+    #       MYSQL_PASSWORD: Miemiemie!23
+    #     ports:
+    #       - 3306:3306
         #options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=10
 
     steps:
@@ -53,8 +53,8 @@ jobs:
 
       - name: Run Tests
         run: mvn test
-        env:
-          SPRING_DATASOURCE_URL: jdbc:mysql://localhost:3306/webapp?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
-          SPRING_DATASOURCE_USERNAME: beluga
-          SPRING_DATASOURCE_PASSWORD: Miemiemie!23
+        # env:
+        #   SPRING_DATASOURCE_URL: jdbc:mysql://localhost:3306/webapp?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+        #   SPRING_DATASOURCE_USERNAME: beluga
+        #   SPRING_DATASOURCE_PASSWORD: Miemiemie!23
 
