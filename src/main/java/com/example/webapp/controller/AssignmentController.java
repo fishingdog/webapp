@@ -31,11 +31,29 @@ public class AssignmentController {
             return ResponseEntity.badRequest().body("Creation Fail. Points Must Be Between 0 and 10.");
         }
 
+
+        if (assignment.getNum_of_attempts() < 0 || assignment.getNum_of_attempts() > 100) {
+            // HTTP 400 BAD REQUEST
+            return ResponseEntity.badRequest().body("Creation Fail. Allowed Attempts Must Be Between 0 and 100.");
+        }
+
+        // 1. Get the authenticated user's details from the SecurityContext
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        String username = userDetails.getUsername();
+
+        // 2. Retrieve the corresponding User entity from the database
+        User currentUser = userService.findByEmail(username);
+
+        // 3. Set the retrieved User entity as the creator of the Assignment
+        assignment.setCreator(currentUser);
+
         return ResponseEntity.ok(assignmentService.createAssignment(assignment));
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<?> updateAssignment(@PathVariable Long id, @RequestBody Assignment assignment) {
+
+    @PutMapping("/{name}")
+    public ResponseEntity<?> updateAssignment(@PathVariable String name, @RequestBody Assignment assignment) {
 
         if (assignment.getPoints() < 0 || assignment.getPoints() > 10) {
             // HTTP 400 BAD REQUEST
@@ -49,7 +67,8 @@ public class AssignmentController {
 
             User currentUser = userService.findByEmail(username);
 
-            return ResponseEntity.ok(assignmentService.updateAssignment(id, assignment, currentUser));
+
+            return ResponseEntity.ok(assignmentService.updateAssignment(name, assignment, currentUser));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.notFound().build();
         } catch (IllegalAccessException e) {
@@ -57,8 +76,8 @@ public class AssignmentController {
         }
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteAssignment(@PathVariable Long id) {
+    @DeleteMapping("/{name}")
+    public ResponseEntity<?> deleteAssignment(@PathVariable String name) {
 
         try {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -66,7 +85,8 @@ public class AssignmentController {
             String username = userDetails.getUsername();
 
             User currentUser = userService.findByEmail(username);
-            assignmentService.deleteAssignment(id, currentUser);
+            assignmentService.deleteAssignment(name, currentUser);
+
             return ResponseEntity.noContent().build();
         } catch (IllegalArgumentException e) {
             return ResponseEntity.notFound().build();
