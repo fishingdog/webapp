@@ -54,7 +54,5 @@ jobs:
       - name: Run Tests
         run: mvn test
         env:
-          SPRING_DATASOURCE_URL: jdbc:mysql://localhost:3306/webapp?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
-          SPRING_DATASOURCE_USERNAME: beluga
-          SPRING_DATASOURCE_PASSWORD: Miemiemie!23
+
 
