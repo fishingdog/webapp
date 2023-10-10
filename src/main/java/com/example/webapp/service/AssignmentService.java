@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class AssignmentService {
@@ -24,13 +25,13 @@ public class AssignmentService {
     }
 
 
-    public Optional<Assignment> getAssignmentByName(String name) {
-        return assignmentRepository.findByName(name);
+    public Optional<Assignment> getAssignmentById(UUID id) {
+        return assignmentRepository.findById(id);
     }
 
-    public Assignment updateAssignment(String name, Assignment assignment, User currentUser) throws IllegalAccessError, IllegalAccessException {
+    public Assignment updateAssignment(UUID id, Assignment assignment, User currentUser) throws IllegalAccessError, IllegalAccessException {
 
-        Assignment existingAssignment = assignmentRepository.findByName(name).orElseThrow(() -> new IllegalArgumentException("Assignment Not Found."));
+        Assignment existingAssignment = assignmentRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Assignment Not Found."));
 
 
         if (!existingAssignment.getCreator().equals(currentUser)) {
@@ -46,8 +47,8 @@ public class AssignmentService {
         return assignmentRepository.save(existingAssignment);
     }
 
-    public void deleteAssignment(String name, User currentUser) throws IllegalAccessException {
-        Assignment existingAssignment = assignmentRepository.findByName(name).orElseThrow(() -> new IllegalArgumentException("Assignment Not Found."));
+    public void deleteAssignment(UUID id, User currentUser) throws IllegalAccessException {
+        Assignment existingAssignment = assignmentRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Assignment Not Found."));
 
         if (!existingAssignment.getCreator().equals(currentUser)) {
             throw new IllegalAccessException("Cannot Delete. Permission Denied.");
