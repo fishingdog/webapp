@@ -35,9 +35,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         final String authorizationHeader = request.getHeader("Authorization");
         final String userEmail;
         final String jwt;
+        final String requestURI = request.getRequestURI();
+
+        if ("/api/auth/authenticate".equals(requestURI) || "/healthz".equals(requestURI)) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
 
         if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer")) {
-            filterChain.doFilter(request, response);
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.getWriter().write("Missing or incorrect 'Authorization' header format.");
+//            filterChain.doFilter(request, response);
             return;
         }
         jwt = authorizationHeader.substring(7);
@@ -58,4 +67,5 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
         filterChain.doFilter(request, response);
     }
+
 }

@@ -5,16 +5,19 @@ import com.example.webapp.model.User;
 import com.example.webapp.service.AssignmentService;
 import com.example.webapp.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @RestController
-@RequestMapping("/assignment")
+@RequestMapping("/v1/assignment")
 public class AssignmentController {
 
     @Autowired
@@ -25,6 +28,11 @@ public class AssignmentController {
 
     @PostMapping
     public ResponseEntity<?> createAssignment(@RequestBody Assignment assignment) {
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated() || authentication instanceof AnonymousAuthenticationToken) {
+            return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+        }
 
         if (assignment.getPoints() < 0 || assignment.getPoints() > 10) {
             // HTTP 400 BAD REQUEST
@@ -37,23 +45,41 @@ public class AssignmentController {
             return ResponseEntity.badRequest().body("Creation Fail. Allowed Attempts Must Be Between 0 and 100.");
         }
 
-        // 1. Get the authenticated user's details from the SecurityContext
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        // Get the authenticated user's details from the SecurityContext
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         String username = userDetails.getUsername();
 
-        // 2. Retrieve the corresponding User entity from the database
+        // Retrieve the corresponding User entity from the database
         User currentUser = userService.findByEmail(username);
 
-        // 3. Set the retrieved User entity as the creator of the Assignment
+        // Set the retrieved User entity as the creator of the Assignment
         assignment.setCreator(currentUser);
 
-        return ResponseEntity.ok(assignmentService.createAssignment(assignment));
+        return new ResponseEntity(assignmentService.createAssignment(assignment), HttpStatus.CREATED);
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getAssignment(@PathVariable UUID id) {
 
-    @PutMapping("/{name}")
-    public ResponseEntity<?> updateAssignment(@PathVariable String name, @RequestBody Assignment assignment) {
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if (authentication == null || !authentication.isAuthenticated() || authentication instanceof AnonymousAuthenticationToken) {
+                return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+            }
+
+            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+            String username = userDetails.getUsername();
+
+            User currentUser = userService.findByEmail(username);
+
+            return ResponseEntity.ok(assignmentService.getAssignmentById(id));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateAssignment(@PathVariable UUID id, @RequestBody Assignment assignment) {
 
         if (assignment.getPoints() < 0 || assignment.getPoints() > 10) {
             // HTTP 400 BAD REQUEST
@@ -68,30 +94,39 @@ public class AssignmentController {
             User currentUser = userService.findByEmail(username);
 
 
-            return ResponseEntity.ok(assignmentService.updateAssignment(name, assignment, currentUser));
+            return ResponseEntity.ok(assignmentService.updateAssignment(id, assignment, currentUser));
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.noContent().build();
         } catch (IllegalAccessException e) {
             return ResponseEntity.status(403).body(e.getMessage());
         }
     }
 
-    @DeleteMapping("/{name}")
-    public ResponseEntity<?> deleteAssignment(@PathVariable String name) {
+    @PatchMapping("/{name}")
+    public ResponseEntity<?> handlePatch() {
+        return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body("PATCH is not allowed for this resource.");
+    }
+
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteAssignment(@PathVariable UUID id) {
 
         try {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if (authentication == null || !authentication.isAuthenticated() || authentication instanceof AnonymousAuthenticationToken) {
+                return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+            }
             UserDetails userDetails = (UserDetails) authentication.getPrincipal();
             String username = userDetails.getUsername();
 
             User currentUser = userService.findByEmail(username);
-            assignmentService.deleteAssignment(name, currentUser);
+            assignmentService.deleteAssignment(id, currentUser);
 
             return ResponseEntity.noContent().build();
         } catch (IllegalArgumentException e) {
             return ResponseEntity.notFound().build();
         } catch (IllegalAccessException e) {
-            return ResponseEntity.status(403).body(e.getMessage());
+            return new ResponseEntity(HttpStatus.NOT_FOUND);
         }
 
     }
