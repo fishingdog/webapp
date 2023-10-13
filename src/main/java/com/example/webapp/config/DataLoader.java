@@ -44,8 +44,9 @@ public class DataLoader implements CommandLineRunner {
             String lastName = userCSV.getLastName();
             String password =  userCSV.getPassword();
 
-            Optional<User> existingUser = userRepository.findByEmail(email);
-            if (!existingUser.isPresent()) {
+            User existingUser = userRepository.findByEmail(email);
+            if (existingUser == null) {
+
                 User user = new User();
                 user.setFirstName(firstName);
                 user.setLastName(lastName);

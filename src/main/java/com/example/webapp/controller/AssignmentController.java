@@ -30,9 +30,11 @@ public class AssignmentController {
     public ResponseEntity<?> createAssignment(@RequestBody Assignment assignment) {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null || !authentication.isAuthenticated() || authentication instanceof AnonymousAuthenticationToken) {
-            return new ResponseEntity(HttpStatus.UNAUTHORIZED);
-        }
+
+//        if (authentication == null || !authentication.isAuthenticated() || authentication instanceof AnonymousAuthenticationToken) {
+//            return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+//        }
+
 
         if (assignment.getPoints() < 0 || assignment.getPoints() > 10) {
             // HTTP 400 BAD REQUEST
@@ -45,9 +47,9 @@ public class AssignmentController {
             return ResponseEntity.badRequest().body("Creation Fail. Allowed Attempts Must Be Between 0 and 100.");
         }
 
-        // Get the authenticated user's details from the SecurityContext
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        String username = userDetails.getUsername();
+
+        String username = (String) authentication.getPrincipal();
+
 
         // Retrieve the corresponding User entity from the database
         User currentUser = userService.findByEmail(username);
@@ -67,8 +69,9 @@ public class AssignmentController {
                 return new ResponseEntity(HttpStatus.UNAUTHORIZED);
             }
 
-            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-            String username = userDetails.getUsername();
+
+            String username = (String) authentication.getPrincipal();
+
 
             User currentUser = userService.findByEmail(username);
 
@@ -88,8 +91,9 @@ public class AssignmentController {
 
         try {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-            String username = userDetails.getUsername();
+
+            String username = (String) authentication.getPrincipal();
+
 
             User currentUser = userService.findByEmail(username);
 
@@ -116,8 +120,9 @@ public class AssignmentController {
             if (authentication == null || !authentication.isAuthenticated() || authentication instanceof AnonymousAuthenticationToken) {
                 return new ResponseEntity(HttpStatus.UNAUTHORIZED);
             }
-            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-            String username = userDetails.getUsername();
+
+            String username = (String) authentication.getPrincipal();
+
 
             User currentUser = userService.findByEmail(username);
             assignmentService.deleteAssignment(id, currentUser);

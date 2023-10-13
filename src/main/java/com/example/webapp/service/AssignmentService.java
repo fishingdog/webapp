@@ -35,7 +35,6 @@ public class AssignmentService {
         Assignment existingAssignment = assignmentRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Assignment Not Found."));
 
 
-
         if (!existingAssignment.getCreator().equals(currentUser)) {
             throw new IllegalAccessException("Cannot Update. Permission Denied.");
         }
@@ -48,7 +47,6 @@ public class AssignmentService {
         existingAssignment.setNum_of_attempts(assignment.getNum_of_attempts());
         return assignmentRepository.save(existingAssignment);
     }
-
 
     public void deleteAssignment(UUID id, User currentUser) throws IllegalAccessException {
         Assignment existingAssignment = assignmentRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Assignment Not Found."));
