@@ -1,3 +1,4 @@
+
 //package com.example.webapp.auth;
 //
 //import com.example.webapp.repository.UserRepository;
@@ -46,11 +47,3 @@
 //                )
 //        );
 //        var user = userRepository.findByEmail(request.getEmail()).orElseThrow(() -> new UsernameNotFoundException("User with email " + request.getEmail() + " not found"));
-//        var jwtToken = jwtService.generateToken(user);
-//        return AuthenticationResponse.builder()
-//                .token(jwtToken)
-//                .build();
-//
-//    }
-//
-//}

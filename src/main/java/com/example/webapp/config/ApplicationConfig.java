@@ -2,9 +2,11 @@ package com.example.webapp.config;
 
 import com.example.webapp.repository.UserRepository;
 
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 @Configuration
@@ -19,6 +21,7 @@ public class ApplicationConfig {
     }
 
 
+
 //    @Bean
 //    public AuthenticationProvider authenticationProvider(){
 //        DaoAuthenticationProvider daoAuthenticationProvider = new DaoAuthenticationProvider();
@@ -31,5 +34,6 @@ public class ApplicationConfig {
 //    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception{
 //        return authenticationConfiguration.getAuthenticationManager();
 //    }
+
 
 }

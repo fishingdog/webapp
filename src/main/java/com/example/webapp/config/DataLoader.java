@@ -46,6 +46,7 @@ public class DataLoader implements CommandLineRunner {
 
             User existingUser = userRepository.findByEmail(email);
             if (existingUser == null) {
+
                 User user = new User();
                 user.setFirstName(firstName);
                 user.setLastName(lastName);

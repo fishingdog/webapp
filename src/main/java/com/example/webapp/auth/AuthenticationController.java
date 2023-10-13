@@ -1,3 +1,4 @@
+
 //package com.example.webapp.auth;
 //
 //import lombok.RequiredArgsConstructor;
@@ -21,6 +22,7 @@
 //    ) {
 //        return ResponseEntity.ok(authenticationService.register(request));
 //    }
+
 //
 //    @PostMapping("/authenticate")
 //    public ResponseEntity<AuthenticationResponse> register(
@@ -29,4 +31,4 @@
 //        return ResponseEntity.ok(authenticationService.authenticate(request));
 //    }
 //
-//}
+
