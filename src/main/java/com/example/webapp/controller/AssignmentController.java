@@ -111,6 +111,11 @@ public class AssignmentController {
         return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body("PATCH is not allowed for this resource.");
     }
 
+    @PatchMapping
+    public ResponseEntity<?> handlePatchBase() {
+        return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body("PATCH is not allowed for this resource.");
+    }
+
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteAssignment(@PathVariable UUID id) {
