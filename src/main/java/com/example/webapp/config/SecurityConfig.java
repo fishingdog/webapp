@@ -17,6 +17,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.http.HttpMethod;
 
 import org.springframework.security.authentication.AuthenticationProvider;
 
@@ -37,7 +38,8 @@ public class SecurityConfig {
                 .csrf((AbstractHttpConfigurer::disable))
                 .authorizeHttpRequests(auth -> auth
 //                        .requestMatchers("/api/auth/authenticate").permitAll()
-                        .requestMatchers("/healthz").permitAll()
+                        .requestMatchers(HttpMethod.PATCH, "/v1/assignment/**", "/v1/assignment").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/healthz").permitAll()
                         .anyRequest().authenticated()
                 )
 //                .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
