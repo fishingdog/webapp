@@ -15,7 +15,7 @@ variable "aws_region" {
 
 variable "source_ami" {
   type    = string
-  default = "ami-0b6edd8449255b799" # Debian 12
+  default = "ami-0b6edd8449255b799" # Ubuntu 22.04 LTS
 
   validation {
     condition     = length(var.source_ami) > 4 && substr(var.source_ami, 0, 4) == "ami-"
@@ -26,7 +26,7 @@ variable "source_ami" {
 
 variable "ssh_username" {
   type    = string
-  default = "admin"
+  default = "ubuntu"
 }
 
 variable "subnet_id" {
@@ -46,12 +46,12 @@ variable "delete_on_termination" {
 
 variable "device_name" {
   type    = string
-  default = "/dev/sdf"
+  default = "/dev/sda1"
 }
 
 variable "volume_size" {
   type    = number
-  default = 25
+  default = 8
 }
 
 variable "volume_type" {
@@ -67,7 +67,7 @@ variable "ami_description" {
 
 variable "ami_regions" {
   type    = list(string)
-  default = ["us-west-2"]
+  default = ["us-east-1", "us-west-2"]
 }
 
 variable "aws_polling_delay" {
@@ -79,27 +79,6 @@ variable "aws_polling_max_attempts" {
   type    = number
   default = 50
 }
-
-variable "docker_username" {
-  description = "Docker login username"
-  sensitive   = true
-  type        = string
-  default     = "ywufandm"
-}
-
-variable "docker_password" {
-  description = "Docker login password"
-  sensitive   = true
-  type        = string
-  default     = "Miemiemie!23"
-}
-
-variable "user_name" {
-  description = "Username for Debian."
-  type        = string
-  default     = "admin"
-}
-
 
 # https://www.packer.io/plugins/builders/amazon/ebs
 source "amazon-ebs" "my-ami" {
@@ -128,62 +107,18 @@ source "amazon-ebs" "my-ami" {
 }
 
 build {
-  sources = [
-    "source.amazon-ebs.my-ami",
-  ]
+  sources = ["source.amazon-ebs.my-ami"]
 
   provisioner "shell" {
     environment_vars = [
       "DEBIAN_FRONTEND=noninteractive",
-      "CHECKPOINT_DISABLE=1",
-      "SSH_USERNAME=${var.user_name}",
-      #      "DOCKER_USERNAME=${var.docker_username}",
-      #      "DOCKER_PASSWORD=${var.docker_password}",
+      "CHECKPOINT_DISABLE=1"
     ]
     inline = [
-      #      "export DEBIAN_FRONTEND=noninteractive",
-      #      "export CHECKPOINT_DISABLE=1",
       "sudo apt-get update",
       "sudo apt-get upgrade -y",
-
-
-      "export PATH=$PATH:/usr/sbin/",
-
-      "echo \"Installing Java\"",
-      "sudo apt install -y openjdk-17-jre",
-
-      "echo \"Installing Maven\"",
-      "sudo apt install -y maven",
-
-      "if [ ! -f \"/opt/users.csv\" ]; then",
-      "  sudo sh -c 'cat << EOF > /opt/users.csv",
-      "first_name,last_name,email,password",
-      "john,doe,john.doe@example.com,abc123",
-      "jane,doe,jane.doe@example.com,xyz456",
-      "EOF'",
-      "fi",
-
-      "sudo apt install -y mariadb-server",
-
-      "sleep 10",
-
-      "echo \"CREATE USER 'beluga'@'%' IDENTIFIED BY 'Miemiemie\\!23';\" > /tmp/commands.sql",
-      "echo \"GRANT ALL PRIVILEGES ON *.* TO 'beluga'@'%';\" >> /tmp/commands.sql",
-      "echo \"CREATE SCHEMA webapp;\" >> /tmp/commands.sql",
-      "echo \"FLUSH PRIVILEGES;\" >> /tmp/commands.sql",
-      "sudo mysql -u root < /tmp/commands.sql",
-
-
+      "..............", # nginx was for demo only. you do not need to install in your AMI.
+      "sudo apt-get clean",
     ]
   }
-
-  provisioner "file" {
-    source      = "/home/bibli/NU/CSYE6225/A5/webapp/target/webapp-0.0.1-SNAPSHOT.jar"
-    destination = "~/webapp-0.0.1-SNAPSHOT.jar"
-  }
-
-  provisioner "shell" {
-    inline = ["timeout 60s java -jar webapp-0.0.1-SNAPSHOT.jar || true"]
-  }
-
 }

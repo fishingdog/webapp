@@ -1,5 +1,0 @@
-#!/bin/bash
-
-# provide variable values to hcl file by
-#   packer validate -var="<variable_name>=<variable_value>" ami.pkr.hcl
-#   packer build -var="<variable_name>=<variable_value>" ami.pkr.hcl
