@@ -10,6 +10,18 @@ jobs:
   build_artifact:
     runs-on: ubuntu-latest
     if: github.event.pull_request.merged == true
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: Miemiemie!23
+          MYSQL_DATABASE: webapp
+          MYSQL_USER: beluga
+          MYSQL_PASSWORD: Miemiemie!23
+        ports:
+          - 3306:3306
+
     steps:
       - name: Checkout
         uses: actions/checkout@v3
