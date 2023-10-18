@@ -7,7 +7,7 @@ on:
       - main
 
 jobs:
-  build_artifact:
+  build_artifact_ami:
     runs-on: ubuntu-latest
     if: github.event.pull_request.merged == true
 
@@ -56,6 +56,7 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_DEV_SECRET_ACCESS_KEY }}
         run: |
           cd packer
+          packer init ami.pkr.hcl
           packer build ami.pkr.hcl
           cd ..
 
