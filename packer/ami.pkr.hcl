@@ -80,20 +80,6 @@ variable "aws_polling_max_attempts" {
   default = 50
 }
 
-variable "docker_username" {
-  description = "Docker login username"
-  sensitive   = true
-  type        = string
-  default     = "ywufandm"
-}
-
-variable "docker_password" {
-  description = "Docker login password"
-  sensitive   = true
-  type        = string
-  default     = "Miemiemie!23"
-}
-
 variable "user_name" {
   description = "Username for Debian."
   type        = string
@@ -137,12 +123,8 @@ build {
       "DEBIAN_FRONTEND=noninteractive",
       "CHECKPOINT_DISABLE=1",
       "SSH_USERNAME=${var.user_name}",
-      #      "DOCKER_USERNAME=${var.docker_username}",
-      #      "DOCKER_PASSWORD=${var.docker_password}",
     ]
     inline = [
-      #      "export DEBIAN_FRONTEND=noninteractive",
-      #      "export CHECKPOINT_DISABLE=1",
       "sudo apt-get update",
       "sudo apt-get upgrade -y",
 
@@ -178,7 +160,8 @@ build {
   }
 
   provisioner "file" {
-    source      = "/home/bibli/NU/CSYE6225/A5/webapp/target/webapp-0.0.1-SNAPSHOT.jar"
+    #    source      = "/home/bibli/NU/CSYE6225/A5/webapp/target/webapp-0.0.1-SNAPSHOT.jar"
+    source      = "../target/webapp-0.0.1-SNAPSHOT.jar"
     destination = "~/webapp-0.0.1-SNAPSHOT.jar"
   }
 
