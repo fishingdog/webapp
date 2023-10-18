@@ -45,7 +45,9 @@ jobs:
           fi
 
       - name: Validate Packer Template
-        run: packer validate packer/ami.pkr.hcl
+        run: |
+          packer init
+          packer validate packer/ami.pkr.hcl
 
       # Create the users.csv file
       - name: Create users.csv
