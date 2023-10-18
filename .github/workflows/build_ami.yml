@@ -48,7 +48,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: webapp-artifact
-          path: ../target/webapp-0.0.1-SNAPSHOT.jar
+          path: ${{ github.workspace }}/target/webapp-0.0.1-SNAPSHOT.jar
 
   create-ami:
     needs: build_artifact
