@@ -1,14 +1,12 @@
 name: CI
 
 on:
-  push:
-    branches:
-      - main
-      - YanWuGit-patch-1
   pull_request:
     branches:
       - main
-      - YanWuGit-patch-1
+      - dev
+    paths:
+      - 'packer/**'
 
 
 jobs:
@@ -36,6 +34,18 @@ jobs:
         with:
           java-version: '17'
           distribution: 'adopt'
+
+      - name: Check Packer Format
+        run: |
+          packer fmt -check packer/ami.pkr.hcl
+          STATUS=$?
+          if [ $STATUS -ne 0 ]; then
+          echo "Packer template is not correctly formatted. Please run 'packer fmt' to format it."
+          exit 1
+          fi
+
+      - name: Validate Packer Template
+        run: packer validate packer/ami.pkr.hcl
 
       # Create the users.csv file
       - name: Create users.csv
