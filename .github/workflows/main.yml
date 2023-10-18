@@ -60,8 +60,10 @@ jobs:
 
       - name: Validate Packer Template
         run: |
-          packer init packer/ami.pkr.hcl
-          packer validate packer/ami.pkr.hcl
+          cd packer
+          packer init ami.pkr.hcl
+          packer validate ami.pkr.hcl
+          cd ..
 
       - name: Run Tests
         run: mvn test
