@@ -71,7 +71,9 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_DEV_ACCESS_KEY }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_DEV_SECRET_ACCESS_KEY }}
         run: |
-          packer build ./packer/ami.pkr.hcl
+          cd packer
+          packer build ami.pkr.hcl
+          cd ..
 
       - name: Fetch latest AMI ID
         env:
