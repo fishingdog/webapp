@@ -32,6 +32,17 @@ jobs:
           java-version: '17'
           distribution: 'adopt'
 
+      - name: Check Packer Format
+        run: |
+          packer fmt -check packer/ami.pkr.hcl
+          STATUS=$?
+          if [ $STATUS -ne 0 ]; then
+          echo "Packer template is not correctly formatted. Please run 'packer fmt' to format it."
+          exit 1
+          fi
+
+
+
       # Create the users.csv file
       - name: Create users.csv
         run: |
@@ -44,11 +55,11 @@ jobs:
       - name: Build with Maven
         run: mvn -e clean install
 
+      - name: Validate Packer Template
+        run: |
+          cd packer
+          packer init ami.pkr.hcl
+          packer validate ami.pkr.hcl
+          cd ..
 
-      - name: Run Tests
-        run: mvn test
-        env:
-          SPRING_DATASOURCE_URL: jdbc:mysql://localhost:3306/webapp?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
-          SPRING_DATASOURCE_USERNAME: beluga
-          SPRING_DATASOURCE_PASSWORD: Miemiemie!23
 
