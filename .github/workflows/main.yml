@@ -44,10 +44,7 @@ jobs:
           exit 1
           fi
 
-      - name: Validate Packer Template
-        run: |
-          packer init packer/ami.pkr.hcl
-          packer validate packer/ami.pkr.hcl
+
 
       # Create the users.csv file
       - name: Create users.csv
@@ -58,10 +55,13 @@ jobs:
           jane,doe,jane.doe@example.com,xyz456
           EOF'
 
-
-
       - name: Build with Maven
         run: mvn -e clean install
+
+      - name: Validate Packer Template
+        run: |
+          packer init packer/ami.pkr.hcl
+          packer validate packer/ami.pkr.hcl
 
       - name: Run Tests
         run: mvn test
