@@ -60,8 +60,11 @@ jobs:
           name: webapp-artifact
           path: ./artifact
 
-      - name: Setup Packer
-        uses: hashicorp/setup-packer@v1
+      - name: Setup `packer`
+        uses: hashicorp/setup-packer@main
+        id: setup
+        with:
+          version: "latest"
 
       - name: Build AMI with Packer
         env:
@@ -70,4 +73,12 @@ jobs:
         run: |
           packer build ./packer/ami.pkr.hcl
 
+      - name: Fetch latest AMI ID
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_DEV_ACCESS_KEY }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_DEV_SECRET_ACCESS_KEY }}
+        run: |
+          # Replace 'YOUR_DEV_ACCOUNT_ID' with your AWS account ID
+          AMI_ID=$(aws ec2 describe-images --filters "Name=tag:CreatedBy,Values=Packer" "Name=owner-id,Values=855584951376" --query "Images | sort_by(@, &CreationDate) | [-1].ImageId" --output text)
+          echo "AMI_ID=$AMI_ID" >> $GITHUB_ENV
 

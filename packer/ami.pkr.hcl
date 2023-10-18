@@ -95,6 +95,7 @@ source "amazon-ebs" "my-ami" {
   ami_regions     = "${var.ami_regions}"
 
 
+
   aws_polling {
     delay_seconds = "${var.aws_polling_delay}"
     max_attempts  = "${var.aws_polling_max_attempts}"
@@ -111,6 +112,11 @@ source "amazon-ebs" "my-ami" {
     volume_size           = "${var.volume_size}"
     volume_type           = "${var.volume_type}"
   }
+
+  tags = {
+    CreatedBy = "Packer"
+  }
+
 }
 
 build {
