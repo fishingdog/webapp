@@ -5,6 +5,8 @@ on:
     types: [closed]
     branches:
       - main
+  workflow_dispatch:
+
 
 jobs:
   build_artifact_ami:
