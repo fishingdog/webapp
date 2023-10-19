@@ -7,7 +7,7 @@ on:
       - branch
 
 jobs:
-  build:
+  packer_check:
     runs-on: ubuntu-latest
 
     services:
