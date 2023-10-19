@@ -1,4 +1,5 @@
-name: Build AMI on PR merge
+
+name: test
 
 on:
   pull_request:
@@ -8,9 +9,8 @@ on:
 
 
 jobs:
-  build_artifact_ami:
+  test:
     runs-on: ubuntu-latest
-    if: github.event.pull_request.merged == true
 
 
     steps:
