@@ -52,15 +52,14 @@ jobs:
         with:
           version: "latest"
 
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_DEV_ACCESS_KEY }}
-          aws-secret-access-key: ${{ secrets.AWS_DEV_SECRET_ACCESS_KEY }}
-          aws-region: us-west-2
 
       - name: Build AMI with Packer
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_DEV_ACCESS_KEY }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_DEV_SECRET_ACCESS_KEY }}
         run: |
+#          export AWS_ACCESS_KEY_ID="AKIA4ONGWJRILQ63MSBB"
+#          export AWS_SECRET_ACCESS_KEY="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"
           cd packer
           packer init ami.pkr.hcl
           packer build ami.pkr.hcl
@@ -68,6 +67,9 @@ jobs:
           
 
       - name: Fetch latest AMI ID
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_DEV_ACCESS_KEY }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_DEV_SECRET_ACCESS_KEY }}
         run: |
           export MY_AMI_ID=$(aws ec2 describe-images \
           --region us-west-2 \
