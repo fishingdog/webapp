@@ -70,6 +70,7 @@ jobs:
         run: |
           export MY_AMI_ID=$(aws ec2 describe-images \
           --region us-west-2 \
+          --owners self \
           --query "Images | sort_by(@, &CreationDate) | [-1].ImageId" \
           --output text)
 
