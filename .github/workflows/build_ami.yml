@@ -1,8 +1,9 @@
 name: Build AMI on PR merge
 
 on:
-  pull_request:
-    types: [closed]
+  push:
+#  pull_request:
+#    types: [closed]
     branches:
       - main
   workflow_dispatch:
