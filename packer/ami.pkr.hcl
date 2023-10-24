@@ -175,4 +175,4 @@ build {
     inline = ["timeout 60s java -jar webapp-0.0.1-SNAPSHOT.jar || true"]
   }
 
-
+}
