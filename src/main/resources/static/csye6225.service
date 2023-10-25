@@ -1,7 +1,7 @@
 [Unit]
 Description=csye6225webapp
-#ConditionPathExists=/opt/application.properties
 After=network.target csye6225.path
+
 
 [Service]
 Type=simple
@@ -9,7 +9,6 @@ User=csye6225
 Group=csye6225
 WorkingDirectory=/home/admin
 EnvironmentFile=/opt/application.properties
-#ExecStartPre=/bin/sh -c 'counter=0; while [ $counter -lt 30 ] && [ ! -f /opt/application.properties ]; do sleep 1; counter=$((counter+1)); done'
 ExecStart=java -jar webapp-0.0.1-SNAPSHOT.jar
 Restart=always
 RestartSec=10
