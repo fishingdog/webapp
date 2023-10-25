@@ -1,0 +1,8 @@
+[Unit]
+Description=Watch for the presence of /opt/application.properties
+
+[Path]
+PathExists=/opt/application.properties
+
+[Install]
+WantedBy=cloud-init.target
