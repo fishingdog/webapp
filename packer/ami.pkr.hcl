@@ -161,7 +161,6 @@ build {
       "echo \"FLUSH PRIVILEGES;\" >> /tmp/commands.sql",
       "sudo mysql -u root < /tmp/commands.sql",
 
-
     ]
   }
 
@@ -175,6 +174,11 @@ build {
     inline = ["timeout 60s java -jar webapp-0.0.1-SNAPSHOT.jar || true"]
   }
 
+  # systemd path
+  provisioner "file" {
+    source      = "../src/main/resources/static/csye6225.path"
+    destination = "/tmp/csye6225.path"
+  }
   # systemd service
   provisioner "file" {
     source      = "../src/main/resources/static/csye6225.service"
@@ -183,12 +187,14 @@ build {
 
   provisioner "shell" {
     inline = [
+      "sudo mv /tmp/csye6225.path /etc/systemd/system/",
       "sudo mv /tmp/csye6225.service /etc/systemd/system/",
       "sudo groupadd csye6225",
       "sudo useradd -s /bin/false -g csye6225 csye6225",
       "sudo systemctl daemon-reload",
-      "sudo systemctl enable csye6225.service",
-      "sudo systemctl restart csye6225.service",
+      "sudo systemctl enable csye6225.path",
+#      "counter=0; while [ $counter -lt 30 ] && [ ! -f /opt/application.properties ]; do sleep 1; counter=$((counter+1)); done",
+#      "sudo systemctl restart csye6225.service",
     ]
   }
 
