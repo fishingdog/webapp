@@ -161,16 +161,16 @@ build {
       "fi",
 
       "mkdir webapp",
-#
-#      "sudo apt install -y mariadb-server",
-#
-#      "sleep 10",
-#
-#      "echo \"CREATE USER 'beluga'@'%' IDENTIFIED BY 'Miemiemie\\!23';\" > /tmp/commands.sql",
-#      "echo \"GRANT ALL PRIVILEGES ON *.* TO 'beluga'@'%';\" >> /tmp/commands.sql",
-#      "echo \"CREATE SCHEMA webapp;\" >> /tmp/commands.sql",
-#      "echo \"FLUSH PRIVILEGES;\" >> /tmp/commands.sql",
-#      "sudo mysql -u root < /tmp/commands.sql",
+      #
+      #      "sudo apt install -y mariadb-server",
+      #
+      #      "sleep 10",
+      #
+      #      "echo \"CREATE USER 'beluga'@'%' IDENTIFIED BY 'Miemiemie\\!23';\" > /tmp/commands.sql",
+      #      "echo \"GRANT ALL PRIVILEGES ON *.* TO 'beluga'@'%';\" >> /tmp/commands.sql",
+      #      "echo \"CREATE SCHEMA webapp;\" >> /tmp/commands.sql",
+      #      "echo \"FLUSH PRIVILEGES;\" >> /tmp/commands.sql",
+      #      "sudo mysql -u root < /tmp/commands.sql",
 
     ]
   }

@@ -47,18 +47,18 @@ jobs:
       - name: Build with Maven
         run: mvn -e clean install
 
+      - name: Run Tests
+        run: mvn test
+        env:
+          SPRING_DATASOURCE_URL: jdbc:mysql://localhost:3306/webapp?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+          SPRING_DATASOURCE_USERNAME: beluga
+          SPRING_DATASOURCE_PASSWORD: Miemiemie!23
+
       - name: Setup `packer`
         uses: hashicorp/setup-packer@main
         id: setup
         with:
           version: "latest"
-
-#      - name: Configure AWS Credentials
-#        uses: aws-actions/configure-aws-credentials@v4
-#        with:
-#          aws-access-key-id: ${{ secrets.AWS_DEV_ACCESS_KEY }}
-#          aws-secret-access-key: ${{ secrets.AWS_DEV_SECRET_ACCESS_KEY }}
-#          aws-region: us-west-2
 
       - name: Build AMI with Packer
         env:
@@ -69,22 +69,6 @@ jobs:
           packer init ami.pkr.hcl
           packer build ami.pkr.hcl
           cd ..
-          
-
-      - name: Fetch latest AMI ID
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_DEV_ACCESS_KEY }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_DEV_SECRET_ACCESS_KEY }}
-        run: |
-          export MY_AMI_ID=$(aws ec2 describe-images \
-          --region us-west-2 \
-          --owners self \
-          --query "Images | sort_by(@, &CreationDate) | [-1].ImageId" \
-          --output text)
-
-          aws ec2 modify-image-attribute \
-          --region us-west-2 \
-          --image-id $MY_AMI_ID \
-          --launch-permission "Add=[{UserId=346759736871}]"
+        
 
 
