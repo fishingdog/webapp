@@ -87,12 +87,21 @@ variable "user_name" {
 }
 
 
+variable "allowed_ami_users" {
+  description = "users who can access created AMI"
+  type        = list(string)
+  default     = ["855584951376", "346759736871"]
+}
+
+
+
 # https://www.packer.io/plugins/builders/amazon/ebs
 source "amazon-ebs" "my-ami" {
   region          = "${var.aws_region}"
   ami_name        = "csye6225_${formatdate("YYYY_MM_DD_hh_mm_ss", timestamp())}"
   ami_description = "${var.ami_description}"
   ami_regions     = "${var.ami_regions}"
+  ami_users       = "${var.allowed_ami_users}"
 
 
 
@@ -151,15 +160,17 @@ build {
       "EOF'",
       "fi",
 
-      "sudo apt install -y mariadb-server",
-
-      "sleep 10",
-
-      "echo \"CREATE USER 'beluga'@'%' IDENTIFIED BY 'Miemiemie\\!23';\" > /tmp/commands.sql",
-      "echo \"GRANT ALL PRIVILEGES ON *.* TO 'beluga'@'%';\" >> /tmp/commands.sql",
-      "echo \"CREATE SCHEMA webapp;\" >> /tmp/commands.sql",
-      "echo \"FLUSH PRIVILEGES;\" >> /tmp/commands.sql",
-      "sudo mysql -u root < /tmp/commands.sql",
+      "mkdir webapp",
+      #
+      #      "sudo apt install -y mariadb-server",
+      #
+      #      "sleep 10",
+      #
+      #      "echo \"CREATE USER 'beluga'@'%' IDENTIFIED BY 'Miemiemie\\!23';\" > /tmp/commands.sql",
+      #      "echo \"GRANT ALL PRIVILEGES ON *.* TO 'beluga'@'%';\" >> /tmp/commands.sql",
+      #      "echo \"CREATE SCHEMA webapp;\" >> /tmp/commands.sql",
+      #      "echo \"FLUSH PRIVILEGES;\" >> /tmp/commands.sql",
+      #      "sudo mysql -u root < /tmp/commands.sql",
 
     ]
   }
@@ -167,7 +178,7 @@ build {
   provisioner "file" {
     #    source      = "/home/bibli/NU/CSYE6225/A5/webapp/target/webapp-0.0.1-SNAPSHOT.jar"
     source      = "../target/webapp-0.0.1-SNAPSHOT.jar"
-    destination = "~/webapp-0.0.1-SNAPSHOT.jar"
+    destination = "~/webapp/webapp-0.0.1-SNAPSHOT.jar"
   }
 
   provisioner "shell" {
@@ -194,6 +205,7 @@ build {
       "sudo mv /tmp/csye6225.service /etc/systemd/system/",
       "sudo groupadd csye6225",
       "sudo useradd -s /bin/false -g csye6225 csye6225",
+      "sudo chown csye6225:csye6225 -R /home/admin/webapp",
       "sudo systemctl daemon-reload",
       "sudo systemctl enable csye6225.path",
 
