@@ -166,10 +166,10 @@ build {
     ]
   }
 
-  provisioner "file" {
-    source      = "../src/main/resources/static/amazon-cloudwatch-agent.json"
-    destination = "~/amazon-cloudwatch-agent.json"
-  }
+#  provisioner "file" {
+#    source      = "../src/main/resources/static/amazon-cloudwatch-agent.json"
+#    destination = "~/amazon-cloudwatch-agent.json"
+#  }
 
   provisioner "file" {
     source      = "../target/webapp-0.0.1-SNAPSHOT.jar"
@@ -181,16 +181,28 @@ build {
   }
 
 
-  # systemd path
+  # systemd path for triggering webapp
   provisioner "file" {
     source      = "../src/main/resources/static/csye6225.path"
     destination = "/tmp/csye6225.path"
   }
 
-  # systemd service
+  # systemd service starts webapp
   provisioner "file" {
     source      = "../src/main/resources/static/csye6225.service"
     destination = "/tmp/csye6225.service"
+  }
+
+  # systemd path for triggering configure and start cloudwatch
+  provisioner "file" {
+    source      = "../src/main/resources/static/cloudwatch.path"
+    destination = "/tmp/cloudwatch.path"
+  }
+
+  # systemd service triggering configure and start cloudwatch
+  provisioner "file" {
+    source      = "../src/main/resources/static/cloudwatch.service"
+    destination = "/tmp/cloudwatch.service"
   }
 
   provisioner "shell" {
@@ -198,16 +210,22 @@ build {
 
       "sudo mv /tmp/csye6225.path /etc/systemd/system/",
       "sudo mv /tmp/csye6225.service /etc/systemd/system/",
+      "sudo mv /tmp/cloudwatch.path /etc/systemd/system/",
+      "sudo mv /tmp/cloudwatch.service /etc/systemd/system/",
       "sudo groupadd csye6225",
       "sudo useradd -s /bin/false -g csye6225 csye6225",
       "sudo chown csye6225:csye6225 -R /home/admin/webapp",
+      "sudo touch /opt/webapp.log",
+      "sudo chown csye6225:csye6225 /opt",
+      "sudo chmod 664 /opt/webapp.log",
+
       "sudo systemctl daemon-reload",
       "sudo systemctl enable csye6225.path",
 
-      #install amazoncloudwatch agent and move configure to /opt
+      #install amazoncloudwatch agent and enable systemd service(path)
       "wget https://amazoncloudwatch-agent.s3.amazonaws.com/debian/amd64/latest/amazon-cloudwatch-agent.deb",
       "sudo dpkg -i -E ./amazon-cloudwatch-agent.deb",
-      "sudo mv amazon-cloudwatch-agent.json /opt",
+      "sudo systemctl enable cloudwatch.path",
 
     ]
   }

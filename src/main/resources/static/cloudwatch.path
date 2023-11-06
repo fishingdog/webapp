@@ -1,0 +1,8 @@
+[Unit]
+Description=Watch for the presence of /opt/amazon-cloudwatch-agent.json
+
+[Path]
+PathExists=/opt/amazon-cloudwatch-agent.json
+
+[Install]
+WantedBy=cloud-init.target
