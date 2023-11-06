@@ -2,11 +2,13 @@ package com.example.webapp.healthz;
 
 
 import jakarta.persistence.EntityManagerFactory;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+import org.slf4j.Logger;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -17,6 +19,7 @@ public class HealthCheckController {
 
     @Autowired
     private DataSource dataSource;
+    private static final Logger logger = LoggerFactory.getLogger(HealthCheckController.class);
 
     @GetMapping
     public ResponseEntity<Void> checkHealth() {
@@ -31,6 +34,7 @@ public class HealthCheckController {
                 throw new Exception("Invalid connection");
             }
         } catch (Exception e) {
+            logger.error("Health check failed", e); // This will log to CloudWatch
             throw new ResponseStatusException(
                     HttpStatus.SERVICE_UNAVAILABLE, "Service Unavailable", e);
         }
