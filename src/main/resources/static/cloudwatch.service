@@ -1,0 +1,18 @@
+[Unit]
+Description=running cloud watch agent
+After=network.target cloudwatch.path
+
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/home/admin
+ExecStart=/opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -c file:/opt/amazon-cloudwatch-agent.json -s
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=inherit
+SyslogIdentifier=csye6225
+
+[Install]
+WantedBy=cloud-init.target
