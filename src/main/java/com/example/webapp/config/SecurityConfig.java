@@ -38,7 +38,7 @@ public class SecurityConfig {
                 .csrf((AbstractHttpConfigurer::disable))
                 .authorizeHttpRequests(auth -> auth
 //                        .requestMatchers("/api/auth/authenticate").permitAll()
-                        .requestMatchers(HttpMethod.PATCH, "/v1/assignment/**", "/v1/assignment").permitAll()
+                        .requestMatchers(HttpMethod.PATCH, "**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/healthz").permitAll()
                         .anyRequest().authenticated()
                 )
