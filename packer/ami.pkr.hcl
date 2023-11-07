@@ -166,10 +166,10 @@ build {
     ]
   }
 
-#  provisioner "file" {
-#    source      = "../src/main/resources/static/amazon-cloudwatch-agent.json"
-#    destination = "~/amazon-cloudwatch-agent.json"
-#  }
+  #  provisioner "file" {
+  #    source      = "../src/main/resources/static/amazon-cloudwatch-agent.json"
+  #    destination = "~/amazon-cloudwatch-agent.json"
+  #  }
 
   provisioner "file" {
     source      = "../target/webapp-0.0.1-SNAPSHOT.jar"
@@ -216,7 +216,7 @@ build {
       "sudo useradd -s /bin/false -g csye6225 csye6225",
       "sudo chown csye6225:csye6225 -R /home/admin/webapp",
       "sudo touch /opt/webapp.log",
-      "sudo chown csye6225:csye6225 /opt",
+      "sudo chown -R csye6225:csye6225 /opt",
       "sudo chmod 664 /opt/webapp.log",
 
       "sudo systemctl daemon-reload",
