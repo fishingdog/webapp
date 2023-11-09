@@ -20,7 +20,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("")
+@RequestMapping("/v1/assignment")
 public class AssignmentController {
 
     @Autowired
