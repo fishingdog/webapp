@@ -26,8 +26,6 @@ public class HealthCheckController {
     private MeterRegistry meterRegistry;
     private static final Logger logger = LoggerFactory.getLogger(HealthCheckController.class);
     private Counter healthCheckCounter;
-//    @Autowired
-//    private StatsDClient statsDClient;
 
     @PostConstruct
     public void init() {
@@ -39,7 +37,6 @@ public class HealthCheckController {
     @GetMapping
     public ResponseEntity<Void> checkHealth() {
         healthCheckCounter.increment();
-//        incrementStatsDCounter();
         try (Connection connection = dataSource.getConnection()) {
             dataSource.setLoginTimeout(3);
             if (connection.isValid(1000)) {
@@ -69,12 +66,6 @@ public class HealthCheckController {
                 .header("Pragma", "no-cache")
                 .build();
     }
-
-//    private void incrementStatsDCounter() {
-//        // This will increment the counter in StatsD
-//        statsDClient.incrementCounter("healthz.endpoint.hit");
-//        logger.info("counter hit");
-//    }
 }
 
 

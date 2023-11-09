@@ -4,6 +4,9 @@ import com.example.webapp.model.Assignment;
 import com.example.webapp.model.User;
 import com.example.webapp.service.AssignmentService;
 import com.example.webapp.service.UserService;
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
+import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,10 +33,31 @@ public class AssignmentController {
     private UserService userService;
 
     private static final Logger logger = LoggerFactory.getLogger(AssignmentController.class);
-
+    @Autowired
+    private MeterRegistry meterRegistry;
+    private Counter assignmentCounterPost;
+    private Counter assignmentCounterGet;
+    private Counter assignmentCounterPut;
+    private Counter assignmentCounterDelete;
+    @PostConstruct
+    public void init() {
+        // Initialize the counter
+        assignmentCounterPost = Counter.builder("endpoint.v1/assignment.PostCalls")
+                .description("Number of Post calls to the v1/assignment endpoint")
+                .register(meterRegistry);
+        assignmentCounterGet = Counter.builder("endpoint.v1/assignment.GetCalls")
+                .description("Number of Get calls to the v1/assignment endpoint")
+                .register(meterRegistry);
+        assignmentCounterPut = Counter.builder("endpoint.v1/assignment.PutCalls")
+                .description("Number of Put calls to the v1/assignment endpoint")
+                .register(meterRegistry);
+        assignmentCounterDelete = Counter.builder("endpoint.v1/assignment.DeleteCalls")
+                .description("Number of Delete calls to the v1/assignment endpoint")
+                .register(meterRegistry);
+    }
     @PostMapping
     public ResponseEntity<?> createAssignment(@RequestBody Assignment assignment) {
-
+        assignmentCounterPost.increment();
         logger.info("Attempting to create a new assignment");
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -78,7 +102,7 @@ public class AssignmentController {
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getAssignment(@PathVariable UUID id) {
-
+        assignmentCounterGet.increment();
         try {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             if (authentication == null || !authentication.isAuthenticated() || authentication instanceof AnonymousAuthenticationToken) {
@@ -109,6 +133,8 @@ public class AssignmentController {
 
     @PutMapping("/{id}")
     public ResponseEntity<?> updateAssignment(@PathVariable UUID id, @RequestBody Assignment assignment) {
+
+        assignmentCounterPut.increment();
         logger.info("Attempting to update assignment with id: {}", id);
 
         if (assignment.getPoints() < 0 || assignment.getPoints() > 10) {
@@ -150,7 +176,7 @@ public class AssignmentController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteAssignment(@PathVariable UUID id) {
-
+        assignmentCounterDelete.increment();
         try {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             if (authentication == null || !authentication.isAuthenticated() || authentication instanceof AnonymousAuthenticationToken) {
