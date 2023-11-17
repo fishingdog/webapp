@@ -166,10 +166,10 @@ build {
     ]
   }
 
-  #  provisioner "file" {
-  #    source      = "../src/main/resources/static/amazon-cloudwatch-agent.json"
-  #    destination = "~/amazon-cloudwatch-agent.json"
-  #  }
+  provisioner "file" {
+    source      = "../src/main/resources/static/amazon-cloudwatch-agent.json"
+    destination = "~/amazon-cloudwatch-agent.json"
+  }
 
   provisioner "file" {
     source      = "../target/webapp-0.0.1-SNAPSHOT.jar"
