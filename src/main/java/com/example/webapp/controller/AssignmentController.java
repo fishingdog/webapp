@@ -1,8 +1,12 @@
 package com.example.webapp.controller;
 
+import com.example.webapp.ExceptionsAndUtil.MaxAttemptExceededException;
+import com.example.webapp.ExceptionsAndUtil.PassDeadlineException;
 import com.example.webapp.model.Assignment;
+import com.example.webapp.model.Submission;
 import com.example.webapp.model.User;
 import com.example.webapp.service.AssignmentService;
+import com.example.webapp.service.SubmissionService;
 import com.example.webapp.service.UserService;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
@@ -15,19 +19,22 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
+// Both assignment and Submission Controllers are here
 @RestController
 @RequestMapping("/v1/assignment")
 public class AssignmentController {
 
     @Autowired
     private AssignmentService assignmentService;
+
+    @Autowired
+    private SubmissionService submissionService;
 
     @Autowired
     private UserService userService;
@@ -66,18 +73,32 @@ public class AssignmentController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User is not authenticated");
         }
 
+        // Validate assignment name range HTTP 400
+        if (assignment.getName() == null) {
+            String nameError = "Creation Fail. Assignments must have a name.";
+            logger.error(nameError);
+            return ResponseEntity.badRequest().body(nameError);
+        }
+
         // Validate points range HTTP 400
-        if (assignment.getPoints() < 0 || assignment.getPoints() > 10) {
-            String pointsError = "Creation Fail. Points must be between 0 and 10.";
+        if (assignment.getPoints() < 0 || assignment.getPoints() > 100) {
+            String pointsError = "Creation Fail. Points must be between 0 and 100.";
             logger.error(pointsError + " Provided: {}", assignment.getPoints());
             return ResponseEntity.badRequest().body(pointsError);
         }
 
         // Validate number of attempts HTTP 400
-        if (assignment.getNum_of_attempts() < 0 || assignment.getNum_of_attempts() > 100) {
-            String attemptsError = "Creation Fail. Number of attempts must be between 0 and 100.";
+        if (assignment.getNum_of_attempts() < 1 || assignment.getNum_of_attempts() > 100) {
+            String attemptsError = "Creation Fail. num_of_attempts must be between 0 and 100.";
             logger.error(attemptsError + " Provided: {}", assignment.getNum_of_attempts());
             return ResponseEntity.badRequest().body(attemptsError);
+        }
+
+        // Validate deadline HTTP 400
+        if (assignment.getDeadline() == null) {
+            String deadlineError = "Creation Fail. Assignments must have a deadline.";
+            logger.error(deadlineError);
+            return ResponseEntity.badRequest().body(deadlineError);
         }
 
         try {
@@ -107,7 +128,7 @@ public class AssignmentController {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             if (authentication == null || !authentication.isAuthenticated() || authentication instanceof AnonymousAuthenticationToken) {
                 logger.warn("Unauthorized access attempt to get assignment with id: {}", id);
-                return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+                return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
             }
 
             String username = (String) authentication.getPrincipal();
@@ -202,4 +223,87 @@ public class AssignmentController {
         }
     }
 
+    @PostMapping("/{id}/submission")
+    public ResponseEntity<?> submitAssignment(@PathVariable UUID id, @RequestBody Submission submission) {
+        logger.info("Attempting to submit an assignment with id: {}", id);
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            logger.error("User is not authenticated");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User is not authenticated");
+        }
+
+        // validate if there is id
+        if (id == null) {
+            logger.error("Assignment ID must not be null.");
+            return ResponseEntity.badRequest().body("Assignment ID must not be null.");
+        }
+
+        // find assignment or 404
+        try {
+            Assignment existingAssignment = assignmentService.getAssignmentById(id)
+                    .orElseThrow(() -> new IllegalArgumentException("Assignment Not Found"));
+
+            // check if passed deadline. Reject if passed.
+            if (existingAssignment.getDeadline().isBefore(LocalDateTime.now())) {
+                throw new PassDeadlineException("Submission rejected. Passed deadline.");
+            }
+        } catch (PassDeadlineException e){
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (IllegalArgumentException e) {
+            logger.error("Invalid argument", e);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
+
+        // Validate url HTTP 400
+        if (submission.getSubmissionUrl() == null) {
+            String urlError = "Creation Fail. Must specify a submission url.";
+            logger.error(urlError);
+            return ResponseEntity.badRequest().body(urlError);
+        }
+
+        // submission uses corresponding assignment id as its id
+        Optional<Submission> fetchSubmission = submissionService.getSubmissionById(id);
+        if (fetchSubmission.isEmpty()) {
+            logger.info("creating a new submission for assignment id {}", id);
+
+            try {
+                String username = (String) authentication.getPrincipal();
+                User currentUser = userService.findByEmail(username);
+
+                submission.setSubmitter(currentUser);
+                submission.setAssignmentId(id);
+                Submission savedSubmission = submissionService.createSubmission(submission);
+                logger.info("Submission created successfully with id: {}", id);
+                return ResponseEntity.status(HttpStatus.CREATED).body(savedSubmission);
+            } catch (Exception e) {
+                logger.error("Error during submission creation", e);
+                return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("Error during submission creation");
+            }
+        } else {
+            try {
+                Assignment existingAssignment = assignmentService.getAssignmentById(id)
+                        .orElseThrow(() -> new IllegalArgumentException("Assignment Not Found"));
+                Submission existingSubmission = submissionService.getSubmissionById(id)
+                        .orElseThrow(() -> new IllegalArgumentException("Submission not found"));
+                //count how many times retried. Reject if more than allowed attempts
+                int maxAttempts = existingAssignment.getNum_of_attempts();
+                if (existingSubmission.getNumberOfAttempts() >= maxAttempts) {
+                    throw new MaxAttemptExceededException("Retry rejected. Max number of attempts reached.");
+                }
+
+                submission.setAssignmentId(id);
+                Submission savedSubmission = submissionService.retrySubmission(submission);
+                logger.info("Resubmission successfully with id: {}", id);
+                return ResponseEntity.status(HttpStatus.CREATED).body(savedSubmission);
+            } catch (IllegalArgumentException e){
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+            } catch (MaxAttemptExceededException e){
+                return ResponseEntity.badRequest().body(e.getMessage());
+            } catch (Exception e) {
+                logger.error("Error during resubmission", e);
+                return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("Error during resubmission");
+            }
+        }
+    }
 }

@@ -1,4 +1,4 @@
-package com.example.webapp.csvmodel;
+package com.example.webapp.model;
 
 import com.opencsv.bean.CsvBindByName;
 
