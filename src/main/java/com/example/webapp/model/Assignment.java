@@ -7,7 +7,6 @@ import lombok.Setter;
 import org.hibernate.annotations.GenericGenerator;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.UUID;
 
 @Entity
@@ -25,10 +24,16 @@ public class Assignment {
     @ManyToOne
     private User creator;
 
-
+    @Column(nullable = false)
     private String name;
-    private Date deadline;
+
+    @Column(nullable = false)
+    private LocalDateTime deadline;
+
+    @Column(nullable = false)
     private int points;
+
+    @Column(nullable = false)
     private int num_of_attempts;
 
 
