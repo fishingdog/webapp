@@ -223,6 +223,7 @@ build {
       "sudo systemctl enable csye6225.path",
 
       #install amazoncloudwatch agent and enable systemd service(path)
+      "sudo mv amazon-cloudwatch-agent.json /opt",
       "wget https://amazoncloudwatch-agent.s3.amazonaws.com/debian/amd64/latest/amazon-cloudwatch-agent.deb",
       "sudo dpkg -i -E ./amazon-cloudwatch-agent.deb",
       "sudo systemctl enable cloudwatch.path",

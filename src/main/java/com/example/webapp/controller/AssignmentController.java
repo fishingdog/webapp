@@ -20,6 +20,9 @@ import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.services.sns.SnsClient;
+import software.amazon.awssdk.services.sns.model.PublishRequest;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -295,6 +298,27 @@ public class AssignmentController {
                 submission.setAssignmentId(id);
                 Submission savedSubmission = submissionService.retrySubmission(submission);
                 logger.info("Resubmission successfully with id: {}", id);
+
+
+
+                // Create and publish the SNS message
+                try (SnsClient snsClient = SnsClient.builder()
+                        .region(Region.of("us-west-2")) // Change to your region
+                        .build()) {
+                    String topicArn = "arn:aws:sns:us-west-2:123456789012:YourTopicName";
+                    PublishRequest publishRequest = PublishRequest.builder()
+                            .message(submission.getSubmissionUrl()) // Message body
+                            .topicArn(topicArn)
+                            .build();
+
+                    snsClient.publish(publishRequest);
+                    logger.info("Submission URL sent to SNS topic");
+                } catch (Exception e) {
+                    logger.error("Failed to send submission URL to SNS topic", e);
+                    // Decide how you want to handle this failure. For now, let's just log it.
+                }
+                // Close the SNS client
+
                 return ResponseEntity.status(HttpStatus.CREATED).body(savedSubmission);
             } catch (IllegalArgumentException e){
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
@@ -305,5 +329,8 @@ public class AssignmentController {
                 return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("Error during resubmission");
             }
         }
+
+
+
     }
 }
