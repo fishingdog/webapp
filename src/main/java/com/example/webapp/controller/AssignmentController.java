@@ -8,6 +8,7 @@ import com.example.webapp.model.User;
 import com.example.webapp.service.AssignmentService;
 import com.example.webapp.service.SubmissionService;
 import com.example.webapp.service.UserService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
 import jakarta.annotation.PostConstruct;
@@ -27,7 +28,9 @@ import software.amazon.awssdk.services.sns.model.ListTopicsResponse;
 import software.amazon.awssdk.services.sns.model.PublishRequest;
 import software.amazon.awssdk.services.sns.model.Topic;
 
+
 import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -353,10 +356,24 @@ public class AssignmentController {
         String topicArn = findTopicArnByName(snsClient, topicName);
         logger.info("topicArn: {}", topicArn);
 
+        // Construct the message as a JSON string
+        ObjectMapper objectMapper = new ObjectMapper();
+        String messageJson = "";
+        try {
+            messageJson = objectMapper.writeValueAsString(Map.of(
+                    "assignmentId", submission.getAssignmentId().toString(),
+                    "submitterEmail", submission.getSubmitter().getEmail(),
+                    "submissionAttempt", submission.getNumberOfAttempts(),
+                    "submissionUrl", submission.getSubmissionUrl()
+            ));
+        } catch (com.fasterxml.jackson.core.JsonProcessingException e) {
+            logger.error("Failed to construct message JSON", e);
+            // Handle JSON construction error
+        }
         // Create and publish the SNS message
         try {
             PublishRequest publishRequest = PublishRequest.builder()
-                    .message(submission.getSubmissionUrl()) // Message body
+                    .message(messageJson) // Message body
                     .topicArn(topicArn)
                     .build();
 
