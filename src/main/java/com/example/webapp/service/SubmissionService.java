@@ -17,8 +17,8 @@ import java.util.UUID;
 public class SubmissionService {
     @Autowired
     private SubmissionRepository submissionRepository;
-    @Autowired
-    private AssignmentRepository assignmentRepository;
+//    @Autowired
+//    private AssignmentRepository assignmentRepository;
 
     public Submission createSubmission(Submission submission){
         submission.setNumberOfAttempts(1);
@@ -29,13 +29,13 @@ public class SubmissionService {
 
 
     public Optional<Submission> getSubmissionById(UUID id) {
-        return submissionRepository.findById(id);
+        return submissionRepository.findByAssignmentId(id);
     }
 
 
     public Submission retrySubmission(Submission submission) {
 
-        Submission existingSubmission = submissionRepository.findById(submission.getAssignmentId()).orElseThrow(() -> new IllegalArgumentException("Submission Not Found."));
+        Submission existingSubmission = submissionRepository.findByAssignmentId(submission.getAssignmentId()).orElseThrow(() -> new IllegalArgumentException("Submission Not Found."));
 
         existingSubmission.setSubmissionRetried(LocalDateTime.now());
         existingSubmission.setSubmissionUrl(submission.getSubmissionUrl());

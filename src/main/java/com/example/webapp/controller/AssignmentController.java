@@ -20,9 +20,12 @@ import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import software.amazon.awssdk.auth.credentials.ProfileCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.sns.SnsClient;
+import software.amazon.awssdk.services.sns.model.ListTopicsResponse;
 import software.amazon.awssdk.services.sns.model.PublishRequest;
+import software.amazon.awssdk.services.sns.model.Topic;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -278,6 +281,10 @@ public class AssignmentController {
                 submission.setAssignmentId(id);
                 Submission savedSubmission = submissionService.createSubmission(submission);
                 logger.info("Submission created successfully with id: {}", id);
+
+                publishSNS(savedSubmission);
+                logger.info("Submission publishing to SNS");
+
                 return ResponseEntity.status(HttpStatus.CREATED).body(savedSubmission);
             } catch (Exception e) {
                 logger.error("Error during submission creation", e);
@@ -299,25 +306,8 @@ public class AssignmentController {
                 Submission savedSubmission = submissionService.retrySubmission(submission);
                 logger.info("Resubmission successfully with id: {}", id);
 
-
-
-                // Create and publish the SNS message
-                try (SnsClient snsClient = SnsClient.builder()
-                        .region(Region.of("us-west-2")) // Change to your region
-                        .build()) {
-                    String topicArn = "arn:aws:sns:us-west-2:123456789012:YourTopicName";
-                    PublishRequest publishRequest = PublishRequest.builder()
-                            .message(submission.getSubmissionUrl()) // Message body
-                            .topicArn(topicArn)
-                            .build();
-
-                    snsClient.publish(publishRequest);
-                    logger.info("Submission URL sent to SNS topic");
-                } catch (Exception e) {
-                    logger.error("Failed to send submission URL to SNS topic", e);
-                    // Decide how you want to handle this failure. For now, let's just log it.
-                }
-                // Close the SNS client
+                publishSNS(savedSubmission);
+                logger.info("Submission publishing to SNS");
 
                 return ResponseEntity.status(HttpStatus.CREATED).body(savedSubmission);
             } catch (IllegalArgumentException e){
@@ -330,7 +320,53 @@ public class AssignmentController {
             }
         }
 
+    }
 
+    private static String findTopicArnByName(SnsClient snsClient, String topicName) {
+        String nextToken = null;
+        do {
+            String finalNextToken = nextToken;
+            ListTopicsResponse listTopicsResponse = snsClient.listTopics(builder -> builder.nextToken(finalNextToken));
+            Optional<Topic> matchingTopic = listTopicsResponse.topics().stream()
+                    .filter(topic -> topic.topicArn().endsWith(":" + topicName))
+                    .findFirst();
 
+            if (matchingTopic.isPresent()) {
+                return matchingTopic.get().topicArn();
+            }
+
+            nextToken = listTopicsResponse.nextToken();
+        } while (nextToken != null);
+
+        throw new IllegalStateException("Topic with name " + topicName + " not found.");
+    }
+
+    public static void publishSNS(Submission submission) {
+
+        // Set up the SNS client
+        SnsClient snsClient = SnsClient.builder()
+                .region(Region.of("us-west-2")) // Change to your region
+                .build();
+
+        // The ARN of the SNS topic you want to publish to
+        String topicName = "lambdaTopic";
+        String topicArn = findTopicArnByName(snsClient, topicName);
+        logger.info("topicArn: {}", topicArn);
+
+        // Create and publish the SNS message
+        try {
+            PublishRequest publishRequest = PublishRequest.builder()
+                    .message(submission.getSubmissionUrl()) // Message body
+                    .topicArn(topicArn)
+                    .build();
+
+            snsClient.publish(publishRequest);
+            logger.info("Submission URL sent to SNS topic");
+        } catch (Exception e) {
+            logger.error("Failed to send submission URL to SNS topic", e);
+            // Decide how you want to handle this failure. For now, let's just log it.
+        } finally {
+            snsClient.close(); // Close the SNS client
+        }
     }
 }

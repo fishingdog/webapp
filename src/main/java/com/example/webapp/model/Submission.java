@@ -14,6 +14,9 @@ import java.util.UUID;
 public class Submission {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private UUID id;
+
     @Column(nullable = false)
     private UUID assignmentId;
 
@@ -29,6 +32,4 @@ public class Submission {
     @Column(updatable = false)
     private LocalDateTime submissionDate;
     private LocalDateTime submissionRetried;
-
-
 }
