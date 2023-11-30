@@ -152,18 +152,27 @@ build {
       "echo \"Installing Maven\"",
       "sudo apt install -y maven",
 
-      "if [ ! -f \"/opt/users.csv\" ]; then",
-      "  sudo sh -c 'cat << EOF > /opt/users.csv",
-      "first_name,last_name,email,password",
-      "john,doe,john.doe@example.com,abc123",
-      "jane,doe,jane.doe@example.com,xyz456",
-      "EOF'",
-      "fi",
+      #      "if [ ! -f \"/opt/users.csv\" ]; then",
+      #      "  sudo sh -c 'cat << EOF > /opt/users.csv",
+      #      "first_name,last_name,email,password",
+      #      "john,doe,john.doe@example.com,abc123",
+      #      "jane,doe,jane.doe@example.com,xyz456",
+      #      "Yan,Wu,2x3tech@gmail.com,mie",
+      #      "Yan2,Wu,wu.yan4@northeastern.edu,mie",
+      #      "Yan3,Wu,ywu@fandm.edu,mie",
+      #      "Xiao,Chen,chen.xiao4@northeastern.edu,mie",
+      #      "EOF'",
+      #      "fi",
 
       "mkdir webapp",
 
 
     ]
+  }
+
+  provisioner "file" {
+    source      = "../src/main/resources/static/users.csv"
+    destination = "~/users.csv"
   }
 
   provisioner "file" {
@@ -207,7 +216,7 @@ build {
 
   provisioner "shell" {
     inline = [
-
+      "sudo mv users.csv /opt/users.csv",
       "sudo mv /tmp/csye6225.path /etc/systemd/system/",
       "sudo mv /tmp/csye6225.service /etc/systemd/system/",
       "sudo mv /tmp/cloudwatch.path /etc/systemd/system/",

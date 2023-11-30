@@ -30,6 +30,7 @@ import software.amazon.awssdk.services.sns.model.Topic;
 
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -272,14 +273,14 @@ public class AssignmentController {
         }
 
         // submission uses corresponding assignment id as its id
-        Optional<Submission> fetchSubmission = submissionService.getSubmissionById(id);
+        String username = (String) authentication.getPrincipal();
+        User currentUser = userService.findByEmail(username);
+        List<Submission> fetchedSubmissions = submissionService.getSubmissionById(id);
+        Optional<Submission> fetchSubmission = submissionService.getSubmissionBySubmitter(fetchedSubmissions, currentUser);
         if (fetchSubmission.isEmpty()) {
             logger.info("creating a new submission for assignment id {}", id);
 
             try {
-                String username = (String) authentication.getPrincipal();
-                User currentUser = userService.findByEmail(username);
-
                 submission.setSubmitter(currentUser);
                 submission.setAssignmentId(id);
                 Submission savedSubmission = submissionService.createSubmission(submission);
@@ -297,15 +298,18 @@ public class AssignmentController {
             try {
                 Assignment existingAssignment = assignmentService.getAssignmentById(id)
                         .orElseThrow(() -> new IllegalArgumentException("Assignment Not Found"));
-                Submission existingSubmission = submissionService.getSubmissionById(id)
-                        .orElseThrow(() -> new IllegalArgumentException("Submission not found"));
+//                Submission existingSubmission = submissionService.getSubmissionById(id)
+//                        .orElseThrow(() -> new IllegalArgumentException("Submission not found"));
                 //count how many times retried. Reject if more than allowed attempts
                 int maxAttempts = existingAssignment.getNum_of_attempts();
-                if (existingSubmission.getNumberOfAttempts() >= maxAttempts) {
+                if (fetchSubmission.get().getNumberOfAttempts() >= maxAttempts) {
                     throw new MaxAttemptExceededException("Retry rejected. Max number of attempts reached.");
                 }
 
                 submission.setAssignmentId(id);
+                submission.setId(fetchSubmission.get().getId());
+                submission.setSubmitter(currentUser);
+                submission.setNumberOfAttempts(fetchSubmission.get().getNumberOfAttempts());
                 Submission savedSubmission = submissionService.retrySubmission(submission);
                 logger.info("Resubmission successfully with id: {}", id);
 
@@ -352,8 +356,11 @@ public class AssignmentController {
                 .build();
 
         // The ARN of the SNS topic you want to publish to
-        String topicName = "lambdaTopic";
-        String topicArn = findTopicArnByName(snsClient, topicName);
+//        String topicName = "lambdaTopic";
+//        String topicArn = findTopicArnByName(snsClient, topicName);
+
+        String topicArn = System.getenv("TOPIC_ARN");
+
         logger.info("topicArn: {}", topicArn);
 
         // Construct the message as a JSON string
