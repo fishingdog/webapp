@@ -4,12 +4,14 @@ import com.example.webapp.ExceptionsAndUtil.MaxAttemptExceededException;
 import com.example.webapp.ExceptionsAndUtil.PassDeadlineException;
 import com.example.webapp.model.Assignment;
 import com.example.webapp.model.Submission;
+import com.example.webapp.model.User;
 import com.example.webapp.repository.AssignmentRepository;
 import com.example.webapp.repository.SubmissionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -28,20 +30,25 @@ public class SubmissionService {
     }
 
 
-    public Optional<Submission> getSubmissionById(UUID id) {
+    public List<Submission> getSubmissionById(UUID id) {
         return submissionRepository.findByAssignmentId(id);
+    }
+
+    public Optional<Submission> getSubmissionBySubmitter(List<Submission> submissions, User submitter) {
+        return submissions.stream()
+                .filter(submission -> submission.getSubmitter() != null && submission.getSubmitter().equals(submitter))
+                .findFirst();
     }
 
 
     public Submission retrySubmission(Submission submission) {
 
-        Submission existingSubmission = submissionRepository.findByAssignmentId(submission.getAssignmentId()).orElseThrow(() -> new IllegalArgumentException("Submission Not Found."));
+        submission.setSubmissionRetried(LocalDateTime.now());
+        submission.setSubmissionDate(LocalDateTime.now());
+//        submission.setSubmissionUrl(submission.getSubmissionUrl());
+        submission.setNumberOfAttempts(submission.getNumberOfAttempts()+1);
 
-        existingSubmission.setSubmissionRetried(LocalDateTime.now());
-        existingSubmission.setSubmissionUrl(submission.getSubmissionUrl());
-        existingSubmission.setNumberOfAttempts(existingSubmission.getNumberOfAttempts()+1);
-
-        return submissionRepository.save(existingSubmission);
+        return submissionRepository.save(submission);
 
     }
 }
