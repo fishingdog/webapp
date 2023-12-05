@@ -93,7 +93,6 @@ jobs:
       # [NEW] Issue command to the auto-scale group to do an instance refresh
           REFRESH_ID=$(aws autoscaling start-instance-refresh --auto-scaling-group-name $ASG_NAME --strategy 'Rolling' --preferences '{"MinHealthyPercentage":50}' --query 'InstanceRefreshId' --output text)
       
-      # [NEW] Wait for instance refresh to complete
           STATUS="InProgress"
           while [ "$STATUS" != "Successful" ]; do
             STATUS=$(aws autoscaling describe-instance-refreshes --auto-scaling-group-name $ASG_NAME --instance-refresh-ids $REFRESH_ID --query 'InstanceRefreshes[0].Status' --output text)
