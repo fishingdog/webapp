@@ -66,6 +66,5 @@ Tips and Troubleshooting
     If you receive a 403 Forbidden error, check your token and ensure you have the required permissions.
     Always check the response body for any error messages. They might provide clues on what went wrong.
     For any 400 Bad Request responses, validate your input against the API's expected input format.
-    If you're using the environment setup in Postman, make sure to select the environment from the drop-down list at the top right.
 
 
