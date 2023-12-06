@@ -91,15 +91,15 @@ jobs:
           
           REFRESH_ID=$(aws autoscaling start-instance-refresh --auto-scaling-group-name $ASG_NAME --strategy 'Rolling' --preferences '{"MinHealthyPercentage":50}' --query 'InstanceRefreshId' --output text)
           
-          STATUS="InProgress"
-          while [ "$STATUS" != "Successful" ]; do
-            STATUS=$(aws autoscaling describe-instance-refreshes --auto-scaling-group-name $ASG_NAME --instance-refresh-ids $REFRESH_ID --query 'InstanceRefreshes[0].Status' --output text)
-            echo "Refresh Status: $STATUS"
-            if [ "$STATUS" == "Failed" ]; then
-              echo "Instance refresh failed"
-              exit 1
-            fi
-            sleep 15
-          done
+          # STATUS="InProgress"
+          # while [ "$STATUS" != "Successful" ]; do
+          #   STATUS=$(aws autoscaling describe-instance-refreshes --auto-scaling-group-name $ASG_NAME --instance-refresh-ids $REFRESH_ID --query 'InstanceRefreshes[0].Status' --output text)
+          #   echo "Refresh Status: $STATUS"
+          #   if [ "$STATUS" == "Failed" ]; then
+          #     echo "Instance refresh failed"
+          #     exit 1
+          #   fi
+          #   sleep 15
+          # done
 
 
