@@ -60,15 +60,15 @@ jobs:
         with:
           version: "latest"
 
-      - name: Build AMI with Packer
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_DEV_ACCESS_KEY }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_DEV_SECRET_ACCESS_KEY }}
-        run: |
-          cd packer
-          packer init ami.pkr.hcl
-          packer build ami.pkr.hcl
-          cd ..
+#      - name: Build AMI with Packer
+#        env:
+#          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_DEV_ACCESS_KEY }}
+#          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_DEV_SECRET_ACCESS_KEY }}
+#        run: |
+#          cd packer
+#          packer init ami.pkr.hcl
+#          packer build ami.pkr.hcl
+#          cd ..
 
       - name: Continue Deployment
         env:
