@@ -36,29 +36,29 @@ jobs:
           distribution: 'adopt'
 
       # Create the users.csv file
-      - name: Create users.csv
-        run: |
-          sudo sh -c 'cat << EOF > /opt/users.csv
-          first_name,last_name,email,password
-          john,doe,john.doe@example.com,abc123
-          jane,doe,jane.doe@example.com,xyz456
-          EOF'
-
-      - name: Build with Maven
-        run: mvn -e clean install
-
-      - name: Run Tests
-        run: mvn test
-        env:
-          SPRING_DATASOURCE_URL: jdbc:mysql://localhost:3306/webapp?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
-          SPRING_DATASOURCE_USERNAME: beluga
-          SPRING_DATASOURCE_PASSWORD: Miemiemie!23
-
-      - name: Setup `packer`
-        uses: hashicorp/setup-packer@main
-        id: setup
-        with:
-          version: "latest"
+#      - name: Create users.csv
+#        run: |
+#          sudo sh -c 'cat << EOF > /opt/users.csv
+#          first_name,last_name,email,password
+#          john,doe,john.doe@example.com,abc123
+#          jane,doe,jane.doe@example.com,xyz456
+#          EOF'
+#
+#      - name: Build with Maven
+#        run: mvn -e clean install
+#
+#      - name: Run Tests
+#        run: mvn test
+#        env:
+#          SPRING_DATASOURCE_URL: jdbc:mysql://localhost:3306/webapp?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+#          SPRING_DATASOURCE_USERNAME: beluga
+#          SPRING_DATASOURCE_PASSWORD: Miemiemie!23
+#
+#      - name: Setup `packer`
+#        uses: hashicorp/setup-packer@main
+#        id: setup
+#        with:
+#          version: "latest"
 
       - name: Build AMI with Packer
         env:
