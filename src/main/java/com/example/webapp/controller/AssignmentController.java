@@ -37,7 +37,7 @@ import java.util.UUID;
 
 // Both assignment and Submission Controllers are here
 @RestController
-@RequestMapping("/v1/assignment")
+@RequestMapping("/v2/assignment")
 public class AssignmentController {
 
     @Autowired
